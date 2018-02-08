@@ -122,7 +122,7 @@ module IOStreams
     #     `SecureRandom.urlsafe_base64(128)`
     #
     # See `man gpg` for the remaining options
-    def self.generate_key(name:, email:, comment: nil, passphrase:, key_type: 'RSA', key_length: 4096, subkey_type: 'RSA', subkey_length: key_length, expire_date: nil)
+    def self.generate_key(name:, email:, comment: nil, passphrase:, key_type: 'RSA', key_length: 4096, subkey_type: 'RSA', subkey_length: key_length, expire_date: nil, pubring: nil, secring: nil)
       version_check
       params = ''
       params << "Key-Type: #{key_type}\n" if key_type
@@ -134,6 +134,10 @@ module IOStreams
       params << "Name-Email: #{email}\n" if email
       params << "Expire-Date: #{expire_date}\n" if expire_date
       params << "Passphrase: #{passphrase}\n" if passphrase
+      params << "%no-ask-passphrase\n" unless passphrase
+      params << "%no-protection\n" unless passphrase
+      params << "%pubring #{pubring}\n" if pubring
+      params << "%secring #{secring}\n" if secring
       params << '%commit'
       command = "#{executable} --batch --gen-key --no-tty --quiet"
 
